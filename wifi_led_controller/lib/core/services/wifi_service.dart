@@ -1,6 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:wifi_scan/wifi_scan.dart';
-import 'package:wifi_iot/wifi_iot.dart';
+import 'package:wifi_scan/wifi_scan.dart' as wifi_scan;
+import 'package:wifi_iot/wifi_iot.dart' as wifi_iot;
 import 'package:wifi_led_controller/features/wifi/models/wifi_network.dart';
 
 class WifiService {
@@ -12,17 +12,17 @@ class WifiService {
     return true;
   }
 
-  Future<List<WifiNetwork>> scanNetworks() async {
-    final canScan = await WiFiScan.instance.canStartScan();
-    if (canScan != CanStartScan.yes) {
+  Future<List<WiFiNetworkInfo>> scanNetworks() async {
+    final canScan = await wifi_scan.WiFiScan.instance.canStartScan();
+    if (canScan != wifi_scan.CanStartScan.yes) {
       throw Exception('Cannot scan for networks');
     }
 
-    await WiFiScan.instance.startScan();
-    final results = await WiFiScan.instance.getScannedResults();
+    await wifi_scan.WiFiScan.instance.startScan();
+    final results = await wifi_scan.WiFiScan.instance.getScannedResults();
 
     return results
-        .map((result) => WifiNetwork(
+        .map((result) => WiFiNetworkInfo(
               ssid: result.ssid,
               bssid: result.bssid,
               signalStrength: result.level,
@@ -32,18 +32,18 @@ class WifiService {
   }
 
   Future<bool> connectToNetwork(String ssid, String password) async {
-    return await WiFiForIoTPlugin.connect(
+    return await wifi_iot.WiFiForIoTPlugin.connect(
       ssid,
       password: password,
-      security: NetworkSecurity.WPA,
+      security: wifi_iot.NetworkSecurity.WPA,
     );
   }
 
   Future<bool> disconnectFromNetwork() async {
-    return await WiFiForIoTPlugin.disconnect();
+    return await wifi_iot.WiFiForIoTPlugin.disconnect();
   }
 
   Future<String?> getCurrentNetwork() async {
-    return await WiFiForIoTPlugin.getSSID();
+    return await wifi_iot.WiFiForIoTPlugin.getSSID();
   }
 }

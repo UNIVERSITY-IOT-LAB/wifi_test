@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wifi_led_controller/features/wifi/models/wifi_network.dart';
 
 class WifiNetworkTile extends StatelessWidget {
-  final WifiNetwork network;
+  final WiFiNetworkInfo network;
   final VoidCallback onTap;
   final bool isConnected;
   final bool isConnecting;
