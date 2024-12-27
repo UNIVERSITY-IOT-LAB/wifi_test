@@ -11,16 +11,13 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('도트 매트릭스 컨트롤'),
         actions: [
-          _buildWifiStatus(context),  // context 추가
+          _buildConnectionStatus(context),
         ],
       ),
       body: Consumer<WifiService>(
         builder: (context, wifiService, child) {
           if (!wifiService.isConnected) {
-            return _buildConnectionGuide(context);  // context 추가
-          }
-          if (wifiService.currentSSID != 'DotMatrix_AP') {
-            return _buildWrongNetworkMessage(context);  // context 추가
+            return _buildConnectionError(context, wifiService);
           }
           return _buildShapeControls(context, wifiService);
         },
@@ -28,7 +25,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWifiStatus(BuildContext context) {  // context 매개변수 추가
+  Widget _buildConnectionStatus(BuildContext context) {
     return Consumer<WifiService>(
       builder: (context, wifiService, child) {
         return Padding(
@@ -37,12 +34,12 @@ class HomeScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                wifiService.isConnected ? Icons.wifi : Icons.wifi_off,
+                wifiService.isConnected ? Icons.check_circle : Icons.error,
                 color: wifiService.isConnected ? Colors.green : Colors.red,
               ),
               const SizedBox(width: 8),
               Text(
-                wifiService.isConnected ? wifiService.currentSSID : '연결 안됨',
+                wifiService.isConnected ? '연결됨' : '연결 안됨',
                 style: TextStyle(
                   color: wifiService.isConnected ? Colors.green : Colors.red,
                 ),
@@ -54,62 +51,26 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildConnectionGuide(BuildContext context) {  // context 매개변수 추가
+  Widget _buildConnectionError(BuildContext context, WifiService wifiService) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.wifi_off, size: 64, color: Colors.grey),
-            const SizedBox(height: 24),
-            const Text(
-              '와이파이 연결이 필요합니다',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              '1. 설정 앱을 열어주세요\n'
-              '2. Wi-Fi 설정으로 이동해주세요\n'
-              '3. "DotMatrix_AP" 네트워크를 찾아 연결해주세요\n'
-              '4. 앱으로 돌아와주세요',
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Provider.of<WifiService>(context, listen: false).refreshConnection();
-              },
-              child: const Text('연결 상태 새로고침'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWrongNetworkMessage(BuildContext context) {  // context 매개변수 추가
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // wifi_alert를 network_check로 변경
-            const Icon(Icons.network_check, size: 64, color: Colors.orange),
-            const SizedBox(height: 24),
-            const Text(
-              '잘못된 네트워크에 연결됨',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              '"DotMatrix_AP" 네트워크에 연결해주세요',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            wifiService.error.isEmpty 
+                ? '연결 끊김' 
+                : '오류: ${wifiService.error}',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            // reconnect 대신 checkConnection 사용
+            onPressed: () => wifiService.checkConnection(),
+            child: const Text('다시 연결'),
+          ),
+        ],
       ),
     );
   }
@@ -129,9 +90,9 @@ class HomeScreen extends StatelessWidget {
             runSpacing: 16,
             alignment: WrapAlignment.center,
             children: [
-              _buildShapeButton(context, wifiService, 'circle', Icons.circle_outlined, '원'),
-              _buildShapeButton(context, wifiService, 'triangle', Icons.change_history, '삼각형'),
-              _buildShapeButton(context, wifiService, 'square', Icons.square_outlined, '사각형'),
+              _buildShapeButton(context, wifiService, 'Ci', Icons.circle_outlined, '원'),
+              _buildShapeButton(context, wifiService, 'Tr', Icons.change_history, '삼각형'),
+              _buildShapeButton(context, wifiService, 'Sq', Icons.square_outlined, '사각형'),
             ],
           ),
         ],

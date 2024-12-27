@@ -4,6 +4,8 @@ import 'package:wifi_dot_test/services/wifi_service.dart';
 import 'package:wifi_dot_test/screens/home_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   runApp(const MyApp());
 }
 
@@ -23,14 +25,6 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-        ),
-        themeMode: ThemeMode.system,
         home: const HomeScreen(),
       ),
     );
